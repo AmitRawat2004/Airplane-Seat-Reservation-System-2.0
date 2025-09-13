@@ -1,0 +1,39 @@
+{
+  "name": "airplane-seat-reservation-system",
+  "version": "2.0.0",
+  "description": "A comprehensive airplane seat reservation system with real-time flight data",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "db:setup": "node scripts/setup-database.js",
+    "api:dev": "cd backend && npm run dev"
+  },
+  "dependencies": {
+    "@headlessui/react": "^1.7.17",
+    "autoprefixer": "^10.4.16",
+    "axios": "^1.6.0",
+    "clsx": "^2.0.0",
+    "date-fns": "^2.30.0",
+    "dotenv": "^16.3.1",
+    "lucide-react": "^0.292.0",
+    "next": "^14.0.0",
+    "postcss": "^8.4.31",
+    "react": "^18.2.0",
+    "react-datepicker": "^4.21.0",
+    "react-dom": "^18.2.0",
+    "react-hot-toast": "^2.4.0",
+    "socket.io-client": "^4.7.0",
+    "tailwindcss": "^3.3.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.8.0",
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "eslint": "^8.51.0",
+    "eslint-config-next": "^14.0.0",
+    "typescript": "^5.2.0"
+  }
+}
