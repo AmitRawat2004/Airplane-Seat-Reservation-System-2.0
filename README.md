@@ -33,6 +33,14 @@ A comprehensive, real-time airplane seat reservation system built with Next.js, 
 - **Weather Integration**: Airport weather conditions
 - **Statistics Dashboard**: Real-time flight performance metrics
 
+### AI-Powered Features (NEW!)
+- **🤖 Dynamic Pricing**: AI analyzes market conditions for optimal pricing
+- **💬 Intelligent Chatbot**: 24/7 AI customer support assistant
+- **✈️ Smart Recommendations**: AI-powered flight and seat suggestions
+- **⏰ Delay Prediction**: AI predicts flight delays based on weather and traffic
+- **📧 Automated Messaging**: AI generates personalized customer communications
+- **🎯 Intelligent Search**: AI-enhanced flight search with preference matching
+
 ## 🛠️ Tech Stack
 
 ### Frontend
@@ -53,6 +61,7 @@ A comprehensive, real-time airplane seat reservation system built with Next.js, 
 - **Helmet**: Security middleware
 - **CORS**: Cross-origin resource sharing
 - **Rate Limiting**: API protection
+- **Google Gemini AI**: AI-powered features and recommendations
 
 ### Database
 - **MongoDB**: Document database
@@ -64,6 +73,7 @@ A comprehensive, real-time airplane seat reservation system built with Next.js, 
 - **AviationStack**: Real-time flight data
 - **OpenSky Network**: Aircraft tracking
 - **FlightAware**: Additional flight information
+- **Google Gemini AI**: AI-powered features and recommendations
 
 ## 📋 Prerequisites
 
@@ -73,6 +83,7 @@ Before running this application, make sure you have:
 - **MongoDB** (local or Atlas)
 - **npm** or **yarn** package manager
 - **Git** for version control
+- **Google Gemini API Key** (for AI features)
 
 ## 🚀 Installation & Setup
 
@@ -113,6 +124,9 @@ PORT=3001
 NODE_ENV=development
 FRONTEND_URL=http://localhost:3000
 
+# AI Configuration (Required for AI features)
+GEMINI_API_KEY=your_gemini_api_key_here
+
 # API Keys (Optional - for real-time data)
 AVIATION_STACK_API_KEY=your_aviation_stack_api_key
 OPENSKY_USERNAME=your_opensky_username
@@ -125,6 +139,12 @@ OPENSKY_PASSWORD=your_opensky_password
 cd backend
 npm run db:seed:mongo
 cd ..
+```
+
+#### Setup AI Features (Optional but Recommended)
+```bash
+# Run the automated Gemini AI setup script
+node scripts/setup-gemini.js
 ```
 
 ### 4. Start the Application
@@ -211,6 +231,14 @@ Currently, the API uses basic authentication. In production, implement JWT token
 - `GET /real-time/seats/:flightId` - Get real-time seat availability
 - `POST /real-time/tracking/:flightId` - Update flight tracking
 
+#### AI Features (NEW!)
+- `POST /ai/pricing/dynamic` - Get AI-powered dynamic pricing recommendations
+- `POST /ai/recommendations/flights` - Get AI-powered flight recommendations
+- `POST /ai/recommendations/seats` - Get AI-powered seat recommendations
+- `POST /ai/support/chat` - Chat with AI customer support assistant
+- `POST /ai/predictions/delays` - Get AI-powered flight delay predictions
+- `POST /ai/messages/generate` - Generate personalized customer messages
+
 ### Example API Calls
 
 #### Search Flights
@@ -235,6 +263,34 @@ curl -X POST "http://localhost:3001/api/bookings" \
     "seatId": "1-10A",
     "totalPrice": 299.00,
     "paymentMethod": "credit_card"
+  }'
+```
+
+#### AI-Powered Features
+```bash
+# Get AI flight recommendations
+curl -X POST "http://localhost:3001/api/ai/recommendations/flights" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "userPreferences": {
+      "priceSensitivity": "medium",
+      "timePreference": "flexible",
+      "seatClass": "economy"
+    },
+    "searchCriteria": {
+      "from": "JFK",
+      "to": "LAX",
+      "date": "2024-01-15",
+      "passengers": 2
+    }
+  }'
+
+# Chat with AI support
+curl -X POST "http://localhost:3001/api/ai/support/chat" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "message": "I need to change my booking",
+    "bookingId": "BK_1234567890_xyz789"
   }'
 ```
 
@@ -264,6 +320,13 @@ curl -X POST "http://localhost:3001/api/bookings" \
 - Flight tracking
 - Weather information
 
+### AI-Powered Features (NEW!)
+- **Intelligent Chatbot**: 24/7 AI customer support
+- **Smart Recommendations**: AI-powered flight and seat suggestions
+- **Dynamic Pricing**: AI-optimized pricing strategies
+- **Delay Predictions**: AI-powered flight delay forecasting
+- **Personalized Messaging**: AI-generated customer communications
+
 ## 🔧 Configuration
 
 ### Environment Variables
@@ -271,6 +334,9 @@ curl -X POST "http://localhost:3001/api/bookings" \
 #### Required
 - `MONGO_URI`: MongoDB connection string
 - `PORT`: Backend server port
+
+#### AI Features (Recommended)
+- `GEMINI_API_KEY`: Google Gemini AI API key
 
 #### Optional (for real-time features)
 - `AVIATION_STACK_API_KEY`: AviationStack API key
@@ -390,6 +456,49 @@ For support and questions:
 - Check the documentation
 - Review the API examples
 
+## 📁 Project Structure
+
+### New AI Integration Files
+
+#### Backend AI Services
+- `backend/services/geminiService.js` - Core Gemini AI service with all AI features
+- `backend/routes/ai.js` - API endpoints for AI-powered features
+- `scripts/setup-gemini.js` - Automated setup script for Gemini AI integration
+
+#### Frontend AI Components
+- `components/AIChatbot.tsx` - AI customer support chatbot component
+- `components/AIFlightRecommendations.tsx` - AI-powered flight recommendations component
+
+#### Documentation & Configuration
+- `GEMINI_INTEGRATION_GUIDE.md` - Comprehensive AI integration guide
+- `Airplane_Seat_Reservation_API.postman_collection.json` - Updated with AI endpoints
+
+### Core Application Files
+```
+├── app/                          # Next.js app directory
+│   ├── flights/[id]/seats/       # Seat selection pages
+│   ├── globals.css               # Global styles
+│   ├── layout.tsx                # Root layout
+│   └── page.tsx                  # Home page
+├── backend/                      # Backend API
+│   ├── config/                   # Database configuration
+│   ├── models/                   # MongoDB models
+│   ├── routes/                   # API routes
+│   ├── services/                 # Business logic services
+│   └── server.js                 # Main server file
+├── components/                   # React components
+│   ├── AIChatbot.tsx            # AI chatbot (NEW!)
+│   ├── AIFlightRecommendations.tsx # AI recommendations (NEW!)
+│   ├── BookingForm.tsx          # Booking form
+│   ├── FlightList.tsx           # Flight listing
+│   ├── FlightSearch.tsx         # Flight search
+│   ├── Header.tsx               # Navigation header
+│   └── SeatMap.tsx              # Interactive seat map
+├── types/                        # TypeScript type definitions
+└── scripts/                      # Utility scripts
+    └── setup-gemini.js          # AI setup script (NEW!)
+```
+
 ## 🎯 Roadmap
 
 ### Version 2.1
@@ -400,20 +509,25 @@ For support and questions:
 - [ ] Analytics and reporting
 
 ### Version 2.2
+- [x] AI-powered pricing ✅
+- [x] AI customer support chatbot ✅
+- [x] Smart flight recommendations ✅
+- [x] Intelligent seat selection ✅
+- [x] Flight delay predictions ✅
 - [ ] Multi-language support
 - [ ] Advanced seat features
 - [ ] Integration with more airlines
-- [ ] AI-powered pricing
 - [ ] Enhanced real-time features
 
 ## 🙏 Acknowledgments
 
 - AviationStack for flight data API
 - OpenSky Network for aircraft tracking
+- Google Gemini AI for intelligent features
 - Tailwind CSS for styling
 - Next.js team for the framework
 - MongoDB community for database support
 
 ---
 
-**Built with ❤️ for the aviation industry**
+**Built with ❤️ by [Amit Singh Rawat] for the aviation industry**
