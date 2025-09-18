@@ -42,6 +42,7 @@ app.use('/api/bookings', require('./routes/bookings'));
 app.use('/api/seats', require('./routes/seats'));
 app.use('/api/airports', require('./routes/airports'));
 app.use('/api/real-time', require('./routes/realTime'));
+app.use('/api/ai', require('./routes/ai'));
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {

@@ -1,0 +1,1169 @@
+{
+	"info": {
+		"_postman_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+		"name": "Airplane Seat Reservation System API",
+		"description": "Complete API collection for the Airplane Seat Reservation System 2.0",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "12345678"
+	},
+	"item": [
+		{
+			"name": "Health & System",
+			"item": [
+				{
+					"name": "Health Check",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/health",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"health"
+							]
+						},
+						"description": "Check if the API server is running"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Flights",
+			"item": [
+				{
+					"name": "Get All Flights",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/flights",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"flights"
+							]
+						},
+						"description": "Retrieve all available flights"
+					},
+					"response": []
+				},
+				{
+					"name": "Search Flights",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/flights/search?from=JFK&to=LAX&date=2024-01-15&passengers=2",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"flights",
+								"search"
+							],
+							"query": [
+								{
+									"key": "from",
+									"value": "JFK",
+									"description": "Departure airport code"
+								},
+								{
+									"key": "to",
+									"value": "LAX",
+									"description": "Arrival airport code"
+								},
+								{
+									"key": "date",
+									"value": "2024-01-15",
+									"description": "Departure date (YYYY-MM-DD)"
+								},
+								{
+									"key": "passengers",
+									"value": "2",
+									"description": "Number of passengers (1-10)"
+								}
+							]
+						},
+						"description": "Search for flights based on criteria"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Flight by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/flights/{{flight_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"flights",
+								"{{flight_id}}"
+							]
+						},
+						"description": "Get details of a specific flight"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Real-time Flight Status",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/flights/real-time/status",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"flights",
+								"real-time",
+								"status"
+							]
+						},
+						"description": "Get real-time flight data"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Flight Tracking",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/flights/{{flight_id}}/tracking",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"flights",
+								"{{flight_id}}",
+								"tracking"
+							]
+						},
+						"description": "Get tracking data for a specific flight"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Flight",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"flightNumber\": \"AA123\",\n  \"airline\": \"American Airlines\",\n  \"departureAirport\": \"JFK\",\n  \"departureCity\": \"New York\",\n  \"departureTime\": \"10:00 AM\",\n  \"departureDate\": \"2024-01-15\",\n  \"arrivalAirport\": \"LAX\",\n  \"arrivalCity\": \"Los Angeles\",\n  \"arrivalTime\": \"1:30 PM\",\n  \"arrivalDate\": \"2024-01-15\",\n  \"duration\": \"5h 30m\",\n  \"basePrice\": 299,\n  \"availableSeats\": 150,\n  \"aircraft\": \"Boeing 737\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/flights",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"flights"
+							]
+						},
+						"description": "Create a new flight (admin only)"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Flight Status",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"status\": \"Delayed\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/flights/{{flight_id}}/status",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"flights",
+								"{{flight_id}}",
+								"status"
+							]
+						},
+						"description": "Update flight status (On Time, Delayed, Cancelled, Boarding, Departed, Arrived)"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Bookings",
+			"item": [
+				{
+					"name": "Get All Bookings",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/bookings",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"bookings"
+							]
+						},
+						"description": "Get all bookings"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Booking by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/bookings/{{booking_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"bookings",
+								"{{booking_id}}"
+							]
+						},
+						"description": "Get specific booking details"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Bookings by Email",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/bookings/email/john.doe@example.com",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"bookings",
+								"email",
+								"john.doe@example.com"
+							]
+						},
+						"description": "Get all bookings for a specific email"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Booking",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"flightId\": \"{{flight_id}}\",\n  \"passengerName\": \"John Doe\",\n  \"passengerEmail\": \"john.doe@example.com\",\n  \"passengerPhone\": \"+1234567890\",\n  \"seatId\": \"{{seat_id}}\",\n  \"totalPrice\": 299,\n  \"paymentMethod\": \"credit_card\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/bookings",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"bookings"
+							]
+						},
+						"description": "Create a new booking"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Booking Status",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"status\": \"confirmed\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/bookings/{{booking_id}}/status",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"bookings",
+								"{{booking_id}}",
+								"status"
+							]
+						},
+						"description": "Update booking status (pending, confirmed, cancelled)"
+					},
+					"response": []
+				},
+				{
+					"name": "Cancel Booking",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/bookings/{{booking_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"bookings",
+								"{{booking_id}}"
+							]
+						},
+						"description": "Cancel a booking"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Seats",
+			"item": [
+				{
+					"name": "Get Seats for Flight",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/seats/flight/{{flight_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"seats",
+								"flight",
+								"{{flight_id}}"
+							]
+						},
+						"description": "Get all seats for a specific flight"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Seat by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/seats/{{seat_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"seats",
+								"{{seat_id}}"
+							]
+						},
+						"description": "Get specific seat details"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Seat Availability",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/seats/flight/{{flight_id}}/availability",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"seats",
+								"flight",
+								"{{flight_id}}",
+								"availability"
+							]
+						},
+						"description": "Get seat availability summary for a flight"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Seat Status",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"status\": \"selected\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/seats/{{seat_id}}/status",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"seats",
+								"{{seat_id}}",
+								"status"
+							]
+						},
+						"description": "Update seat status (available, occupied, selected, premium)"
+					},
+					"response": []
+				},
+				{
+					"name": "Bulk Update Seat Status",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"seatIds\": [\"{{seat_id_1}}\", \"{{seat_id_2}}\"],\n  \"status\": \"occupied\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/seats/bulk-status",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"seats",
+								"bulk-status"
+							]
+						},
+						"description": "Update multiple seats at once"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Seats for Flight",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"seats\": [\n    {\n      \"row\": 1,\n      \"column\": \"A\",\n      \"price\": 299,\n      \"class\": \"economy\"\n    },\n    {\n      \"row\": 1,\n      \"column\": \"B\",\n      \"price\": 299,\n      \"class\": \"economy\"\n    },\n    {\n      \"row\": 1,\n      \"column\": \"C\",\n      \"price\": 399,\n      \"class\": \"business\"\n    }\n  ]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/seats/flight/{{flight_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"seats",
+								"flight",
+								"{{flight_id}}"
+							]
+						},
+						"description": "Create seats for a specific flight"
+					},
+					"response": []
+				},
+				{
+					"name": "Reserve Seats Temporarily",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"seatIds\": [\"{{seat_id_1}}\", \"{{seat_id_2}}\"],\n  \"duration\": 600\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/seats/reserve",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"seats",
+								"reserve"
+							]
+						},
+						"description": "Reserve seats temporarily (5-15 minutes)"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Airports",
+			"item": [
+				{
+					"name": "Get All Airports",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/airports",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"airports"
+							]
+						},
+						"description": "Get all airports"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Airport by Code",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/airports/code/JFK",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"airports",
+								"code",
+								"JFK"
+							]
+						},
+						"description": "Get airport by IATA code"
+					},
+					"response": []
+				},
+				{
+					"name": "Search Airports",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/airports/search?q=New York&country=USA",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"airports",
+								"search"
+							],
+							"query": [
+								{
+									"key": "q",
+									"value": "New York",
+									"description": "Search query"
+								},
+								{
+									"key": "country",
+									"value": "USA",
+									"description": "Filter by country"
+								},
+								{
+									"key": "city",
+									"value": "",
+									"description": "Filter by city"
+								}
+							]
+						},
+						"description": "Search airports by name, code, or city"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Airports by Country",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/airports/country/USA",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"airports",
+								"country",
+								"USA"
+							]
+						},
+						"description": "Get all airports in a specific country"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Airport",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"code\": \"LAX\",\n  \"name\": \"Los Angeles International Airport\",\n  \"city\": \"Los Angeles\",\n  \"country\": \"USA\",\n  \"latitude\": 33.9425,\n  \"longitude\": -118.4081\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/airports",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"airports"
+							]
+						},
+						"description": "Create a new airport"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Airport",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Updated Airport Name\",\n  \"city\": \"Updated City\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/airports/{{airport_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"airports",
+								"{{airport_id}}"
+							]
+						},
+						"description": "Update airport information"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Airport",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/airports/{{airport_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"airports",
+								"{{airport_id}}"
+							]
+						},
+						"description": "Delete an airport"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Real-time Data",
+			"item": [
+				{
+					"name": "Get Real-time Flights",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/real-time/flights?from=JFK&to=LAX",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"real-time",
+								"flights"
+							],
+							"query": [
+								{
+									"key": "from",
+									"value": "JFK",
+									"description": "Departure airport"
+								},
+								{
+									"key": "to",
+									"value": "LAX",
+									"description": "Arrival airport"
+								}
+							]
+						},
+						"description": "Get real-time flight data"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Flight Tracking",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/real-time/tracking/{{flight_id}}?limit=10",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"real-time",
+								"tracking",
+								"{{flight_id}}"
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": "10",
+									"description": "Number of tracking records to return"
+								}
+							]
+						},
+						"description": "Get flight tracking data"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Live Flight Map",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/real-time/map",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"real-time",
+								"map"
+							]
+						},
+						"description": "Get live flight map data"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Flight Delays",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/real-time/delays",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"real-time",
+								"delays"
+							]
+						},
+						"description": "Get flight delays and cancellations"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Weather Conditions",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/real-time/weather/JFK",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"real-time",
+								"weather",
+								"JFK"
+							]
+						},
+						"description": "Get weather conditions for an airport"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Flight Statistics",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/real-time/stats",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"real-time",
+								"stats"
+							]
+						},
+						"description": "Get flight statistics for today"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Real-time Seat Availability",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/real-time/seats/{{flight_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"real-time",
+								"seats",
+								"{{flight_id}}"
+							]
+						},
+						"description": "Get real-time seat availability for a flight"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Flight Tracking",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"latitude\": 40.7128,\n  \"longitude\": -74.0060,\n  \"altitude\": 35000,\n  \"speed\": 500,\n  \"heading\": 270,\n  \"status\": \"Departed\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/real-time/tracking/{{flight_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"real-time",
+								"tracking",
+								"{{flight_id}}"
+							]
+						},
+						"description": "Update flight tracking data"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "AI Features",
+			"item": [
+				{
+					"name": "AI Dynamic Pricing",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"flightId\": \"{{flight_id}}\",\n  \"marketConditions\": {\n    \"demand\": \"high\",\n    \"season\": \"peak\",\n    \"competitorPrices\": [299, 350, 320],\n    \"timeUntilDeparture\": 86400000\n  }\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/ai/pricing/dynamic",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"ai",
+								"pricing",
+								"dynamic"
+							]
+						},
+						"description": "Get AI-powered dynamic pricing recommendations"
+					},
+					"response": []
+				},
+				{
+					"name": "AI Flight Recommendations",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"userPreferences\": {\n    \"priceSensitivity\": \"medium\",\n    \"timePreference\": \"flexible\",\n    \"seatClass\": \"economy\",\n    \"connectionPreference\": \"direct\",\n    \"airlinePreference\": [\"American Airlines\", \"Delta\"]\n  },\n  \"searchCriteria\": {\n    \"from\": \"JFK\",\n    \"to\": \"LAX\",\n    \"date\": \"2024-01-15\",\n    \"passengers\": 2\n  }\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/ai/recommendations/flights",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"ai",
+								"recommendations",
+								"flights"
+							]
+						},
+						"description": "Get AI-powered flight recommendations based on user preferences"
+					},
+					"response": []
+				},
+				{
+					"name": "AI Seat Recommendations",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"flightId\": \"{{flight_id}}\",\n  \"userProfile\": {\n    \"preferences\": [\"window\", \"exit_row\"],\n    \"travelPurpose\": \"business\",\n    \"priceSensitivity\": \"low\",\n    \"physicalNeeds\": [\"extra_legroom\"],\n    \"seatClass\": \"economy\"\n  }\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/ai/recommendations/seats",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"ai",
+								"recommendations",
+								"seats"
+							]
+						},
+						"description": "Get AI-powered seat recommendations"
+					},
+					"response": []
+				},
+				{
+					"name": "AI Customer Support Chat",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"message\": \"I need to change my booking\",\n  \"bookingId\": \"{{booking_id}}\",\n  \"userId\": \"user123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/ai/support/chat",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"ai",
+								"support",
+								"chat"
+							]
+						},
+						"description": "Chat with AI customer support assistant"
+					},
+					"response": []
+				},
+				{
+					"name": "AI Flight Delay Prediction",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"flightId\": \"{{flight_id}}\",\n  \"weatherData\": {\n    \"departureAirport\": {\n      \"condition\": \"clear\",\n      \"wind\": \"light\",\n      \"visibility\": \"good\"\n    },\n    \"arrivalAirport\": {\n      \"condition\": \"cloudy\",\n      \"wind\": \"moderate\",\n      \"visibility\": \"fair\"\n    }\n  },\n  \"trafficData\": {\n    \"congestion\": \"medium\",\n    \"delays\": [\"15min\", \"30min\"],\n    \"airportCapacity\": \"normal\"\n  }\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/ai/predictions/delays",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"ai",
+								"predictions",
+								"delays"
+							]
+						},
+						"description": "Get AI-powered flight delay predictions"
+					},
+					"response": []
+				},
+				{
+					"name": "AI Generate Customer Message",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"messageType\": \"booking_confirmation\",\n  \"bookingId\": \"{{booking_id}}\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/ai/messages/generate",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"ai",
+								"messages",
+								"generate"
+							]
+						},
+						"description": "Generate personalized customer messages using AI"
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:3001",
+			"type": "string"
+		},
+		{
+			"key": "flight_id",
+			"value": "FL_1234567890_abc123def",
+			"type": "string"
+		},
+		{
+			"key": "booking_id",
+			"value": "BK_1234567890_xyz789",
+			"type": "string"
+		},
+		{
+			"key": "seat_id",
+			"value": "FL_1234567890_abc123def-1A",
+			"type": "string"
+		},
+		{
+			"key": "seat_id_1",
+			"value": "FL_1234567890_abc123def-1A",
+			"type": "string"
+		},
+		{
+			"key": "seat_id_2",
+			"value": "FL_1234567890_abc123def-1B",
+			"type": "string"
+		},
+		{
+			"key": "airport_id",
+			"value": "AP_JFK_1234567890",
+			"type": "string"
+		}
+	]
+}
