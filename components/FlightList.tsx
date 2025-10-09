@@ -3,6 +3,8 @@
 import { useState } from 'react';
 import { Plane, Clock, MapPin, Users, DollarSign } from 'lucide-react';
 import { Flight } from '@/types/flight';
+import { usePreferences } from '@/contexts/PreferencesContext';
+import { useTranslation } from '@/lib/i18n';
 import Link from 'next/link';
 
 interface FlightListProps {
@@ -10,10 +12,11 @@ interface FlightListProps {
 }
 
 export default function FlightList({ flights }: FlightListProps) {
+  const { t } = useTranslation();
   return (
     <div className="space-y-4">
       <h2 className="text-2xl font-semibold text-gray-900 mb-6">
-        Available Flights ({flights.length})
+        {t('availableFlights')} ({flights.length})
       </h2>
       
       {flights.map((flight) => (
@@ -25,6 +28,8 @@ export default function FlightList({ flights }: FlightListProps) {
 
 function FlightCard({ flight }: { flight: Flight }) {
   const [isExpanded, setIsExpanded] = useState(false);
+  const { formatPrice } = usePreferences();
+  const { t } = useTranslation();
 
   return (
     <div className="card hover:shadow-lg transition-shadow duration-200">
@@ -38,14 +43,14 @@ function FlightCard({ flight }: { flight: Flight }) {
                 <h3 className="text-lg font-semibold text-gray-900">
                   {flight.airline}
                 </h3>
-                <p className="text-sm text-gray-600">Flight {flight.flightNumber}</p>
+                <p className="text-sm text-gray-600">{t('flightNumberShort',) || `Flight ${flight.flightNumber}`}</p>
               </div>
             </div>
             <div className="text-right">
               <p className="text-2xl font-bold text-primary-600">
-                ${flight.price}
+                {formatPrice(flight.price)}
               </p>
-              <p className="text-sm text-gray-600">per passenger</p>
+              <p className="text-sm text-gray-600">{t('perPassenger')}</p>
             </div>
           </div>
 
@@ -83,7 +88,7 @@ function FlightCard({ flight }: { flight: Flight }) {
             <div className="flex items-center space-x-4">
               <span className="flex items-center space-x-1">
                 <Users className="h-4 w-4" />
-                <span>{flight.availableSeats} seats available</span>
+                <span>{t('availableSeatsLabel')?.replace(':','') || `${flight.availableSeats} seats available`}: {flight.availableSeats}</span>
               </span>
               <span>{flight.aircraft}</span>
             </div>
@@ -103,13 +108,13 @@ function FlightCard({ flight }: { flight: Flight }) {
             href={`/flights/${flight.id}/seats`}
             className="btn-primary text-center"
           >
-            Select Seats
+            {t('selectSeats')}
           </Link>
           <button
             onClick={() => setIsExpanded(!isExpanded)}
             className="btn-secondary"
           >
-            {isExpanded ? 'Hide Details' : 'Show Details'}
+            {isExpanded ? t('hideDetails') : t('showDetails')}
           </button>
         </div>
       </div>
@@ -119,22 +124,22 @@ function FlightCard({ flight }: { flight: Flight }) {
         <div className="mt-6 pt-6 border-t border-gray-200">
           <div className="grid md:grid-cols-2 gap-6">
             <div>
-              <h4 className="font-semibold text-gray-900 mb-3">Flight Details</h4>
+              <h4 className="font-semibold text-gray-900 mb-3">{t('flightDetails') || 'Flight Details'}</h4>
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Aircraft:</span>
+                  <span className="text-gray-600">{t('aircraft') || 'Aircraft:'}</span>
                   <span className="font-medium">{flight.aircraft}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Flight Number:</span>
+                  <span className="text-gray-600">{t('flightNumber') || 'Flight Number:'}</span>
                   <span className="font-medium">{flight.flightNumber}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Available Seats:</span>
+                  <span className="text-gray-600">{t('availableSeatsLabel') || 'Available Seats:'}</span>
                   <span className="font-medium">{flight.availableSeats}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Status:</span>
+                  <span className="text-gray-600">{t('status') || 'Status:'}</span>
                   <span className="font-medium">{flight.status}</span>
                 </div>
               </div>
@@ -143,16 +148,16 @@ function FlightCard({ flight }: { flight: Flight }) {
               <h4 className="font-semibold text-gray-900 mb-3">Pricing</h4>
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Base Fare:</span>
-                  <span className="font-medium">${flight.price}</span>
+                  <span className="text-gray-600">{t('baseFare')}:</span>
+                  <span className="font-medium">{formatPrice(flight.price)}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Taxes & Fees:</span>
-                  <span className="font-medium">~$25</span>
+                  <span className="text-gray-600">{t('taxesFees')}:</span>
+                  <span className="font-medium">{formatPrice(25)}</span>
                 </div>
                 <div className="flex justify-between border-t pt-2">
-                  <span className="font-medium">Total:</span>
-                  <span className="font-bold text-lg">${flight.price + 25}</span>
+                  <span className="font-medium">{t('total')}:</span>
+                  <span className="font-bold text-lg">{formatPrice(flight.price + 25)}</span>
                 </div>
               </div>
             </div>

@@ -8,6 +8,8 @@ import SeatMap from '@/components/SeatMap';
 import BookingForm from '@/components/BookingForm';
 import { Flight, Seat } from '@/types/flight';
 import Header from '@/components/Header';
+import { useTranslation } from '@/lib/i18n';
+import { usePreferences } from '@/contexts/PreferencesContext';
 
 export default function SeatSelectionPage() {
   const params = useParams();
@@ -16,6 +18,8 @@ export default function SeatSelectionPage() {
   const [flight, setFlight] = useState<Flight | null>(null);
   const [selectedSeats, setSelectedSeats] = useState<Seat[]>([]);
   const [loading, setLoading] = useState(true);
+  const { t } = useTranslation();
+  const { formatPrice } = usePreferences();
 
   useEffect(() => {
     const apiBase = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3001/api';
@@ -68,7 +72,7 @@ export default function SeatSelectionPage() {
         <div className="container mx-auto px-4 py-8">
           <div className="text-center py-12">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto"></div>
-            <p className="mt-4 text-gray-600">Loading flight details...</p>
+            <p className="mt-4 text-gray-600">{t('loadingFlightDetails')}</p>
           </div>
         </div>
       </div>
@@ -81,9 +85,9 @@ export default function SeatSelectionPage() {
         <Header />
         <div className="container mx-auto px-4 py-8">
           <div className="text-center py-12">
-            <p className="text-gray-600">Flight not found.</p>
+            <p className="text-gray-600">{t('flightNotFound')}</p>
             <Link href="/" className="btn-primary mt-4 inline-block">
-              Back to Search
+              {t('backToSearch')}
             </Link>
           </div>
         </div>
@@ -104,7 +108,7 @@ export default function SeatSelectionPage() {
           className="inline-flex items-center space-x-2 text-gray-600 hover:text-primary-600 mb-6"
         >
           <ArrowLeft className="h-4 w-4" />
-          <span>Back to Search</span>
+          <span>{t('backToSearch')}</span>
         </Link>
 
         {/* Flight Info Header */}
@@ -113,9 +117,9 @@ export default function SeatSelectionPage() {
             <div className="flex items-center space-x-4">
               <Plane className="h-8 w-8 text-primary-600" />
               <div>
-                <h1 className="text-2xl font-bold text-gray-900">
-                  Select Your Seats
-                </h1>
+                  <h1 className="text-2xl font-bold text-gray-900">
+                    {t('selectYourSeats')}
+                  </h1>
                 <p className="text-gray-600">
                   {flight.airline} - Flight {flight.flightNumber}
                 </p>
@@ -138,7 +142,7 @@ export default function SeatSelectionPage() {
           <div className="lg:col-span-2">
             <div className="card">
               <h2 className="text-xl font-semibold text-gray-900 mb-6">
-                Seat Map
+                {t('seatMap') || 'Seat Map'}
               </h2>
               <SeatMap 
                 flightId={flightId}
@@ -152,33 +156,33 @@ export default function SeatSelectionPage() {
           <div className="lg:col-span-1">
             <div className="card sticky top-8">
               <h2 className="text-xl font-semibold text-gray-900 mb-6">
-                Booking Summary
+                {t('bookingSummary')}
               </h2>
               
               {selectedSeats.length > 0 ? (
                 <>
                   <div className="space-y-4 mb-6">
                     <div className="flex items-center justify-between">
-                      <span className="text-gray-600">Selected Seats:</span>
+                      <span className="text-gray-600">{t('selectedSeatsLabel')}</span>
                       <span className="font-medium">
                         {selectedSeats.map(seat => `${seat.row}${seat.column}`).join(', ')}
                       </span>
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="text-gray-600">Base Price:</span>
-                      <span className="font-medium">${flight.price}</span>
+                      <span className="text-gray-600">{t('basePriceLabel')}</span>
+                      <span className="font-medium">{formatPrice(flight.price)}</span>
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="text-gray-600">Seat Upgrades:</span>
+                      <span className="text-gray-600">{t('seatUpgrades')}</span>
                       <span className="font-medium">
-                        ${selectedSeats.reduce((sum, seat) => sum + (seat.price - flight.price), 0)}
+                        {formatPrice(selectedSeats.reduce((sum, seat) => sum + (seat.price - flight.price), 0))}
                       </span>
                     </div>
                     <div className="border-t pt-4">
                       <div className="flex items-center justify-between">
-                        <span className="text-lg font-semibold">Total:</span>
+                        <span className="text-lg font-semibold">{t('totalLabel') || 'Total:'}</span>
                         <span className="text-2xl font-bold text-primary-600">
-                          ${totalPrice}
+                          {formatPrice(totalPrice)}
                         </span>
                       </div>
                     </div>

@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Search, MapPin, Calendar, Users } from 'lucide-react';
+import { useTranslation } from '@/lib/i18n';
 import { SearchParams } from '@/types/flight';
 
 interface FlightSearchProps {
@@ -15,6 +16,7 @@ export default function FlightSearch({ onSearch }: FlightSearchProps) {
     date: '',
     passengers: 1,
   });
+  const { t } = useTranslation();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -32,13 +34,13 @@ export default function FlightSearch({ onSearch }: FlightSearchProps) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      <h2 className="text-2xl font-semibold text-gray-900 mb-6">Search Flights</h2>
+      <h2 className="text-2xl font-semibold text-gray-900 mb-6">{t('searchFlights')}</h2>
       
       <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* From */}
         <div className="relative">
           <label htmlFor="from" className="block text-sm font-medium text-gray-700 mb-2">
-            From
+            {t('from')}
           </label>
           <div className="relative">
             <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
@@ -47,7 +49,7 @@ export default function FlightSearch({ onSearch }: FlightSearchProps) {
               id="from"
               value={formData.from}
               onChange={(e) => handleInputChange('from', e.target.value)}
-              placeholder="Airport code (e.g., JFK)"
+              placeholder={t('airportCodePlaceholder') || 'Airport code (e.g., JFK)'}
               className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
               required
             />
@@ -57,7 +59,7 @@ export default function FlightSearch({ onSearch }: FlightSearchProps) {
         {/* To */}
         <div className="relative">
           <label htmlFor="to" className="block text-sm font-medium text-gray-700 mb-2">
-            To
+            {t('to')}
           </label>
           <div className="relative">
             <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
@@ -66,7 +68,7 @@ export default function FlightSearch({ onSearch }: FlightSearchProps) {
               id="to"
               value={formData.to}
               onChange={(e) => handleInputChange('to', e.target.value)}
-              placeholder="Airport code (e.g., LAX)"
+              placeholder={t('airportCodePlaceholder') || 'Airport code (e.g., LAX)'}
               className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
               required
             />
@@ -76,7 +78,7 @@ export default function FlightSearch({ onSearch }: FlightSearchProps) {
         {/* Date */}
         <div className="relative">
           <label htmlFor="date" className="block text-sm font-medium text-gray-700 mb-2">
-            Date
+            {t('date')}
           </label>
           <div className="relative">
             <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
@@ -95,7 +97,7 @@ export default function FlightSearch({ onSearch }: FlightSearchProps) {
         {/* Passengers */}
         <div className="relative">
           <label htmlFor="passengers" className="block text-sm font-medium text-gray-700 mb-2">
-            Passengers
+            {t('passengers')}
           </label>
           <div className="relative">
             <Users className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
@@ -107,7 +109,7 @@ export default function FlightSearch({ onSearch }: FlightSearchProps) {
             >
               {[1, 2, 3, 4, 5, 6, 7, 8].map(num => (
                 <option key={num} value={num}>
-                  {num} {num === 1 ? 'Passenger' : 'Passengers'}
+                  {num} {num === 1 ? t('passenger') : t('passengersPlural')}
                 </option>
               ))}
             </select>
@@ -120,7 +122,7 @@ export default function FlightSearch({ onSearch }: FlightSearchProps) {
         className="w-full md:w-auto btn-primary flex items-center justify-center space-x-2 px-8 py-3"
       >
         <Search className="h-5 w-5" />
-        <span>Search Flights</span>
+        <span>{t('search')}</span>
       </button>
     </form>
   );

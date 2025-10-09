@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { Seat } from '@/types/flight';
+import { usePreferences } from '@/contexts/PreferencesContext';
+import { useTranslation } from '@/lib/i18n';
 
 interface SeatMapProps {
   flightId: string;
@@ -12,29 +14,34 @@ interface SeatMapProps {
 export default function SeatMap({ flightId, selectedSeats, onSeatSelect }: SeatMapProps) {
   const [seats, setSeats] = useState<Seat[]>([]);
   const [loading, setLoading] = useState(true);
+  const { formatPrice } = usePreferences();
+  const { t } = useTranslation();
+
+  const fetchSeats = async () => {
+    const apiBase = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3001/api';
+    try {
+      const res = await fetch(`${apiBase}/seats/flight/${encodeURIComponent(flightId)}`, { cache: 'no-store' });
+      const json = await res.json();
+      const seatsFromApi = (json?.data ?? []).map((s: any) => ({
+        id: s.id,
+        row: s.row,
+        column: s.column,
+        status: s.status,
+        price: s.price,
+        class: s.class
+      }));
+      setSeats(seatsFromApi);
+    } catch (e) {
+      console.error(e);
+      setSeats([]);
+    }
+  };
 
   useEffect(() => {
-    const apiBase = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3001/api';
     (async () => {
       setLoading(true);
-      try {
-        const res = await fetch(`${apiBase}/seats/flight/${encodeURIComponent(flightId)}`, { cache: 'no-store' });
-        const json = await res.json();
-        const seatsFromApi = (json?.data ?? []).map((s: any) => ({
-          id: s.id,
-          row: s.row,
-          column: s.column,
-          status: s.status,
-          price: s.price,
-          class: s.class
-        }));
-        setSeats(seatsFromApi);
-      } catch (e) {
-        console.error(e);
-        setSeats([]);
-      } finally {
-        setLoading(false);
-      }
+      await fetchSeats();
+      setLoading(false);
     })();
   }, [flightId]);
 
@@ -51,16 +58,61 @@ export default function SeatMap({ flightId, selectedSeats, onSeatSelect }: SeatM
     return seat.price;
   };
 
-  const handleSeatClick = (seat: Seat) => {
+  const handleSeatClick = async (seat: Seat) => {
     if (seat.status === 'occupied') return;
+    
+    // Check if seat is already selected locally
+    const isSelected = selectedSeats.find(s => s.id === seat.id);
+    
+    if (isSelected) {
+      // Deselect seat - release reservation
+      try {
+        const apiBase = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3001/api';
+        await fetch(`${apiBase}/seats/${seat.id}/status`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ status: 'available' })
+        });
+      } catch (error) {
+        console.error('Error releasing seat:', error);
+      }
+    } else {
+      // Select seat - reserve it
+      try {
+        const apiBase = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3001/api';
+        const response = await fetch(`${apiBase}/seats/reserve`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            seatIds: [seat.id], 
+            duration: 600 // 10 minutes
+          })
+        });
+        
+        if (!response.ok) {
+          const errorData = await response.json();
+          console.error('Failed to reserve seat:', errorData);
+          alert(`Failed to reserve seat: ${errorData.error || 'Unknown error'}`);
+          return;
+        }
+      } catch (error) {
+        console.error('Error reserving seat:', error);
+        alert('Failed to reserve seat. Please try again.');
+        return;
+      }
+    }
+    
     onSeatSelect(seat);
+    
+    // Refresh seat data to show updated status
+    await fetchSeats();
   };
 
   if (loading) {
     return (
       <div className="text-center py-12">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mx-auto"></div>
-        <p className="mt-2 text-gray-600">Loading seat map...</p>
+        <p className="mt-2 text-gray-600">{t('loadingSeatMap')}</p>
       </div>
     );
   }
@@ -75,25 +127,25 @@ export default function SeatMap({ flightId, selectedSeats, onSeatSelect }: SeatM
       <div className="flex flex-wrap items-center gap-4 text-sm">
         <div className="flex items-center space-x-2">
           <div className="seat seat-available w-6 h-6"></div>
-          <span>Available</span>
+          <span>{t('available')}</span>
         </div>
         <div className="flex items-center space-x-2">
           <div className="seat seat-selected w-6 h-6"></div>
-          <span>Selected</span>
+          <span>{t('selected')}</span>
         </div>
         <div className="flex items-center space-x-2">
           <div className="seat seat-occupied w-6 h-6"></div>
-          <span>Occupied</span>
+          <span>{t('occupied')}</span>
         </div>
         <div className="flex items-center space-x-2">
           <div className="seat seat-premium w-6 h-6"></div>
-          <span>Premium</span>
+          <span>{t('premium')}</span>
         </div>
       </div>
 
       {/* First Class */}
       <div>
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">First Class</h3>
+  <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('firstClass')}</h3>
         <div className="bg-gray-100 p-4 rounded-lg">
           <div className="grid grid-cols-4 gap-2 max-w-xs mx-auto">
             {firstClassSeats.map(seat => (
@@ -101,7 +153,7 @@ export default function SeatMap({ flightId, selectedSeats, onSeatSelect }: SeatM
                 key={seat.id}
                 onClick={() => handleSeatClick(seat)}
                 className={`seat ${getSeatClass(seat)}`}
-                title={`Seat ${seat.row}${seat.column} - $${getSeatPrice(seat)}`}
+                title={`Seat ${seat.row}${seat.column} - ${formatPrice(getSeatPrice(seat))}`}
               >
                 {seat.row}{seat.column}
               </button>
@@ -112,7 +164,7 @@ export default function SeatMap({ flightId, selectedSeats, onSeatSelect }: SeatM
 
       {/* Business Class */}
       <div>
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Business Class</h3>
+  <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('businessClass')}</h3>
         <div className="bg-gray-50 p-4 rounded-lg">
           <div className="grid grid-cols-6 gap-2 max-w-md mx-auto">
             {businessClassSeats.map(seat => (
@@ -120,7 +172,7 @@ export default function SeatMap({ flightId, selectedSeats, onSeatSelect }: SeatM
                 key={seat.id}
                 onClick={() => handleSeatClick(seat)}
                 className={`seat ${getSeatClass(seat)}`}
-                title={`Seat ${seat.row}${seat.column} - $${getSeatPrice(seat)}`}
+                title={`Seat ${seat.row}${seat.column} - ${formatPrice(getSeatPrice(seat))}`}
               >
                 {seat.row}{seat.column}
               </button>
@@ -131,7 +183,7 @@ export default function SeatMap({ flightId, selectedSeats, onSeatSelect }: SeatM
 
       {/* Economy Class */}
       <div>
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Economy Class</h3>
+  <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('economyClass')}</h3>
         <div className="bg-white border border-gray-200 p-4 rounded-lg">
           <div className="grid grid-cols-6 gap-2 max-w-md mx-auto">
             {economyClassSeats.map(seat => (
@@ -139,7 +191,7 @@ export default function SeatMap({ flightId, selectedSeats, onSeatSelect }: SeatM
                 key={seat.id}
                 onClick={() => handleSeatClick(seat)}
                 className={`seat ${getSeatClass(seat)}`}
-                title={`Seat ${seat.row}${seat.column} - $${getSeatPrice(seat)}`}
+                title={`Seat ${seat.row}${seat.column} - ${formatPrice(getSeatPrice(seat))}`}
               >
                 {seat.row}{seat.column}
               </button>
@@ -150,19 +202,19 @@ export default function SeatMap({ flightId, selectedSeats, onSeatSelect }: SeatM
 
       {/* Aircraft Layout Info */}
       <div className="text-center text-sm text-gray-600 bg-gray-50 p-4 rounded-lg">
-        <p className="font-medium mb-2">Aircraft Layout</p>
+  <p className="font-medium mb-2">{t('aircraftLayout') || 'Aircraft Layout'}</p>
         <div className="flex justify-center space-x-8">
-          <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-2">
             <span className="font-medium">A</span>
-            <span>Window</span>
+            <span>{t('window') || 'Window'}</span>
           </div>
           <div className="flex items-center space-x-2">
             <span className="font-medium">B</span>
             <span>Window</span>
           </div>
-          <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-2">
             <span className="font-medium">C</span>
-            <span>Aisle</span>
+            <span>{t('aisle') || 'Aisle'}</span>
           </div>
           <div className="flex items-center space-x-2">
             <span className="font-medium">D</span>

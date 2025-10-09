@@ -28,7 +28,8 @@ router.get('/search', [
   require('express-validator').query('from').optional().isString().trim(),
   require('express-validator').query('to').optional().isString().trim(),
   require('express-validator').query('date').optional().isISO8601(),
-  require('express-validator').query('passengers').optional().isInt({ min: 1, max: 10 })
+  require('express-validator').query('passengers').optional().isInt({ min: 1, max: 10 }),
+  require('express-validator').query('includeRealTime').optional().isBoolean()
 ], async (req, res) => {
   try {
     const errors = validationResult(req);
@@ -40,25 +41,127 @@ router.get('/search', [
     }
 
     const { from, to, date, passengers = 1 } = req.query;
+    const includeRealTime = String(req.query.includeRealTime || 'false') === 'true';
+    
+    console.log('Raw query params:', { from, to, date, passengers, includeRealTime });
     
     const criteria = {
-      from: from?.toUpperCase(),
-      to: to?.toUpperCase(),
-      date: date
+      from: from,
+      to: to,
+      date: date,
+      passengers: passengers
+    };
+    
+    console.log('Search criteria:', criteria);
+
+    // Helper filter to handle potentially incomplete external data (case-insensitive)
+    const matches = (value, target) =>
+      typeof value === 'string' && typeof target === 'string' &&
+      value.toLowerCase().includes(target.toLowerCase());
+
+    const withinOneDay = (dateA, dateB) => {
+      try {
+        const a = new Date(`${dateA}T00:00:00Z`).getTime();
+        const b = new Date(`${dateB}T00:00:00Z`).getTime();
+        const diff = Math.abs(a - b);
+        return diff <= 24 * 60 * 60 * 1000;
+      } catch (_) { return false; }
     };
 
-    const flights = await flightDataService.searchFlights(criteria);
-    
-    // Filter flights based on available seats
-    const availableFlights = flights.filter(flight => 
-      flight.availableSeats >= parseInt(passengers)
-    );
+    const filterByCriteria = (flight, options = { enforceDate: true, relaxDateForRealtime: false }) => {
+      const fromOk = !criteria.from ||
+        matches(flight?.departure?.airport || '', criteria.from) ||
+        matches(flight?.departure?.city || '', criteria.from) ||
+        matches(flight?.departure?.country || '', criteria.from);
+      const toOk = !criteria.to ||
+        matches(flight?.arrival?.airport || '', criteria.to) ||
+        matches(flight?.arrival?.city || '', criteria.to) ||
+        matches(flight?.arrival?.country || '', criteria.to);
+
+      let dateOk = true;
+      if (options.enforceDate && criteria.date) {
+        const fDate = flight?.departure?.date;
+        if (options.relaxDateForRealtime) {
+          dateOk = !fDate || fDate === criteria.date || withinOneDay(fDate, criteria.date);
+        } else {
+          dateOk = fDate === criteria.date;
+        }
+      }
+
+      const seatsOk = (Number.isFinite(flight?.availableSeats) ? flight.availableSeats : 0) >= parseInt(passengers);
+      return fromOk && toOk && dateOk && seatsOk;
+    };
+
+    if (!includeRealTime) {
+      console.log('Searching flights with criteria:', criteria);
+      const flights = await flightDataService.searchFlights(criteria);
+      console.log('Found flights:', flights.length);
+      
+      return res.json({
+        success: true,
+        data: flights,
+        count: flights.length,
+        searchCriteria: { ...criteria, includeRealTime: false }
+      });
+    }
+
+    // Hybrid: DB + real-time in parallel and merge
+    const [dbResult, rtResult] = await Promise.allSettled([
+      flightDataService.searchFlights(criteria),
+      flightDataService.getRealTimeFlightsNoFallback()
+    ]);
+
+    const dbFlights = dbResult.status === 'fulfilled' && Array.isArray(dbResult.value) ? dbResult.value : [];
+    const rtFlightsRaw = rtResult.status === 'fulfilled' && Array.isArray(rtResult.value) ? rtResult.value : [];
+
+    // Normalize minimal shape for dedupe safety
+    const normalizeDate = (d) => (typeof d === 'string' && d.length >= 8) ? d : new Date().toISOString().split('T')[0];
+    const rtFlights = rtFlightsRaw.map(f => ({
+      ...f,
+      departure: {
+        airport: f?.departure?.airport || 'N/A',
+        city: f?.departure?.city || 'Unknown',
+        country: f?.departure?.country || 'Unknown',
+        time: f?.departure?.time || 'N/A',
+        date: normalizeDate(f?.departure?.date)
+      },
+      arrival: {
+        airport: f?.arrival?.airport || 'N/A',
+        city: f?.arrival?.city || 'Unknown',
+        country: f?.arrival?.country || 'Unknown',
+        time: f?.arrival?.time || 'N/A',
+        date: normalizeDate(f?.arrival?.date)
+      },
+      availableSeats: Number.isFinite(f?.availableSeats) ? f.availableSeats : 0
+    }));
+
+    const merged = [...dbFlights, ...rtFlights];
+
+    // Dedupe by flightNumber + departure.date
+    const seen = new Set();
+    const deduped = [];
+    for (const f of merged) {
+      const key = `${f?.flightNumber || 'UNKNOWN'}|${f?.departure?.date || normalizeDate(null)}`;
+      if (!seen.has(key)) {
+        seen.add(key);
+        deduped.push(f);
+      }
+    }
+
+    let filtered = deduped.filter(f => filterByCriteria(f, { enforceDate: true, relaxDateForRealtime: true }));
+
+    let dateRelaxed = false;
+    if (filtered.length === 0 && criteria.date) {
+      // As a final fallback for real-time, try ignoring date entirely
+      filtered = deduped.filter(f => filterByCriteria(f, { enforceDate: false, relaxDateForRealtime: true }));
+      dateRelaxed = true;
+    }
 
     res.json({
       success: true,
-      data: availableFlights,
-      count: availableFlights.length,
-      searchCriteria: criteria
+      data: filtered,
+      count: filtered.length,
+      searchCriteria: { ...criteria, includeRealTime, dateRelaxed }
     });
   } catch (error) {
     console.error('Error searching flights:', error);

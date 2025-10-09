@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation';
 import { User, Mail, CreditCard, CheckCircle } from 'lucide-react';
 import { Flight, Seat } from '@/types/flight';
 import toast from 'react-hot-toast';
+import { usePreferences } from '@/contexts/PreferencesContext';
+import { useTranslation } from '@/lib/i18n';
 
 interface BookingFormProps {
   flight: Flight;
@@ -14,6 +16,8 @@ interface BookingFormProps {
 
 export default function BookingForm({ flight, selectedSeats, totalPrice }: BookingFormProps) {
   const router = useRouter();
+  const { formatPrice } = usePreferences();
+  const { t } = useTranslation();
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -55,7 +59,7 @@ export default function BookingForm({ flight, selectedSeats, totalPrice }: Booki
       console.log('Booking data:', bookingData);
       
       setIsSuccess(true);
-      toast.success('Booking confirmed! Check your email for details.');
+      toast.success(t('bookingConfirmed') || 'Booking confirmed! Check your email for details.');
       
       // Redirect to confirmation page after 2 seconds
       setTimeout(() => {
@@ -75,14 +79,14 @@ export default function BookingForm({ flight, selectedSeats, totalPrice }: Booki
       <div className="text-center py-8">
         <CheckCircle className="h-16 w-16 text-green-500 mx-auto mb-4" />
         <h3 className="text-xl font-semibold text-gray-900 mb-2">
-          Booking Confirmed!
+          {t('bookingConfirmed') || 'Booking Confirmed!'}
         </h3>
         <p className="text-gray-600 mb-4">
-          Your flight has been successfully booked. You will receive a confirmation email shortly.
+          {t('accountCreatedWelcome') || 'Your flight has been successfully booked. You will receive a confirmation email shortly.'}
         </p>
         <div className="bg-green-50 p-4 rounded-lg">
           <p className="text-sm text-green-800">
-            Booking Reference: <span className="font-mono font-bold">SKY{Date.now().toString().slice(-6)}</span>
+            {t('bookingReference') || 'Booking Reference'}: <span className="font-mono font-bold">SKY{Date.now().toString().slice(-6)}</span>
           </p>
         </div>
       </div>
@@ -94,12 +98,12 @@ export default function BookingForm({ flight, selectedSeats, totalPrice }: Booki
       {/* Passenger Information */}
       <div>
         <h3 className="text-lg font-semibold text-gray-900 mb-4">
-          Passenger Information
+          {t('passengerInformation')}
         </h3>
         <div className="grid md:grid-cols-2 gap-4">
           <div>
             <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 mb-1">
-              First Name
+              {t('firstName')}
             </label>
             <div className="relative">
               <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -115,7 +119,7 @@ export default function BookingForm({ flight, selectedSeats, totalPrice }: Booki
           </div>
           <div>
             <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 mb-1">
-              Last Name
+              {t('lastName')}
             </label>
             <div className="relative">
               <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -133,7 +137,7 @@ export default function BookingForm({ flight, selectedSeats, totalPrice }: Booki
         <div className="grid md:grid-cols-2 gap-4 mt-4">
           <div>
             <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-              Email
+              {t('email')}
             </label>
             <div className="relative">
               <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -149,7 +153,7 @@ export default function BookingForm({ flight, selectedSeats, totalPrice }: Booki
           </div>
           <div>
             <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">
-              Phone
+              {t('phoneNumber')}
             </label>
             <input
               type="tel"
@@ -166,12 +170,12 @@ export default function BookingForm({ flight, selectedSeats, totalPrice }: Booki
       {/* Payment Information */}
       <div>
         <h3 className="text-lg font-semibold text-gray-900 mb-4">
-          Payment Information
+          {t('paymentInformation') || 'Payment Information'}
         </h3>
         <div className="space-y-4">
           <div>
             <label htmlFor="cardNumber" className="block text-sm font-medium text-gray-700 mb-1">
-              Card Number
+              {t('cardNumber') || 'Card Number'}
             </label>
             <div className="relative">
               <CreditCard className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -189,7 +193,7 @@ export default function BookingForm({ flight, selectedSeats, totalPrice }: Booki
           <div className="grid md:grid-cols-2 gap-4">
             <div>
               <label htmlFor="expiryDate" className="block text-sm font-medium text-gray-700 mb-1">
-                Expiry Date
+                {t('expiryDate') || 'Expiry Date'}
               </label>
               <input
                 type="text"
@@ -203,7 +207,7 @@ export default function BookingForm({ flight, selectedSeats, totalPrice }: Booki
             </div>
             <div>
               <label htmlFor="cvv" className="block text-sm font-medium text-gray-700 mb-1">
-                CVV
+                {t('cvv') || 'CVV'}
               </label>
               <input
                 type="text"
@@ -251,7 +255,7 @@ export default function BookingForm({ flight, selectedSeats, totalPrice }: Booki
             <span>Processing...</span>
           </div>
         ) : (
-          `Confirm Booking - $${totalPrice}`
+          `${t('confirmBooking')} ${formatPrice(totalPrice)}`
         )}
       </button>
 

@@ -288,6 +288,11 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}",
+								"type": "text"
 							}
 						],
 						"body": {
@@ -924,6 +929,271 @@
 			]
 		},
 		{
+			"name": "Authentication",
+			"item": [
+				{
+					"name": "User Signup",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"phone\": \"+1234567890\",\n  \"email\": \"john.doe@example.com\",\n  \"password\": \"securePassword123\",\n  \"otp\": \"123456\"\n}"
+						},
+						"url": {
+							"raw": "{{frontend_url}}/api/auth/signup",
+							"host": [
+								"{{frontend_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"signup"
+							]
+						},
+						"description": "Create a new user account with phone verification"
+					},
+					"response": []
+				},
+				{
+					"name": "User Login (Password)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"phone\": \"+1234567890\",\n  \"password\": \"securePassword123\",\n  \"rememberDevice\": true\n}"
+						},
+						"url": {
+							"raw": "{{frontend_url}}/api/auth/login",
+							"host": [
+								"{{frontend_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"login"
+							]
+						},
+						"description": "Login with phone number and password"
+					},
+					"response": []
+				},
+				{
+					"name": "User Login (OTP)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"phone\": \"+1234567890\",\n  \"otp\": \"123456\"\n}"
+						},
+						"url": {
+							"raw": "{{frontend_url}}/api/auth/login",
+							"host": [
+								"{{frontend_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"login"
+							]
+						},
+						"description": "Passwordless login with OTP verification"
+					},
+					"response": []
+				},
+				{
+					"name": "Send OTP",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"phone\": \"+1234567890\",\n  \"type\": \"login\",\n  \"method\": \"sms\"\n}"
+						},
+						"url": {
+							"raw": "{{frontend_url}}/api/auth/send-otp",
+							"host": [
+								"{{frontend_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"send-otp"
+							]
+						},
+						"description": "Send OTP via SMS/WhatsApp/Voice for verification"
+					},
+					"response": []
+				},
+				{
+					"name": "Verify OTP",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"phone\": \"+1234567890\",\n  \"otp\": \"123456\",\n  \"type\": \"login\"\n}"
+						},
+						"url": {
+							"raw": "{{frontend_url}}/api/auth/verify-otp",
+							"host": [
+								"{{frontend_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"verify-otp"
+							]
+						},
+						"description": "Verify OTP code for authentication"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Current User",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{frontend_url}}/api/auth/me",
+							"host": [
+								"{{frontend_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"me"
+							]
+						},
+						"description": "Get current authenticated user information"
+					},
+					"response": []
+				},
+				{
+					"name": "User Logout",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{frontend_url}}/api/auth/logout",
+							"host": [
+								"{{frontend_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"logout"
+							]
+						},
+						"description": "Logout user and invalidate session"
+					},
+					"response": []
+				},
+				{
+					"name": "Reset Password",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"phone\": \"+1234567890\",\n  \"otp\": \"123456\",\n  \"newPassword\": \"newSecurePassword123\"\n}"
+						},
+						"url": {
+							"raw": "{{frontend_url}}/api/auth/reset-password",
+							"host": [
+								"{{frontend_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"reset-password"
+							]
+						},
+						"description": "Reset user password with OTP verification"
+					},
+					"response": []
+				},
+				{
+					"name": "Update User Profile",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"newemail@example.com\",\n  \"preferences\": {\n    \"notifications\": {\n      \"sms\": true,\n      \"email\": true,\n      \"push\": false\n    },\n    \"language\": \"en\",\n    \"currency\": \"USD\"\n  }\n}"
+						},
+						"url": {
+							"raw": "{{frontend_url}}/api/auth/update-user",
+							"host": [
+								"{{frontend_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"update-user"
+							]
+						},
+						"description": "Update user profile information"
+					},
+					"response": []
+				}
+			]
+		},
+		{
 			"name": "AI Features",
 			"item": [
 				{
@@ -1163,6 +1433,16 @@
 		{
 			"key": "airport_id",
 			"value": "AP_JFK_1234567890",
+			"type": "string"
+		},
+		{
+			"key": "frontend_url",
+			"value": "http://localhost:3000",
+			"type": "string"
+		},
+		{
+			"key": "auth_token",
+			"value": "your_jwt_token_here",
 			"type": "string"
 		}
 	]
